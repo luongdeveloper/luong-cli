@@ -34,11 +34,27 @@ class DockerController {
             logCmd.done({
                 text: "Docker is already installed"
             })
+
         }
         return
     }
 
-
+    async installPostgres(params: {
+        username: string,
+        password: string,
+        database: string,
+        dockerName: string,
+        port: string
+    }): Promise<any> {
+        await this.setup();
+        logCmd.warn({
+            text: "Start postgres database with docker"
+        })
+        await execShPro(`sudo docker run --name ${params.dockerName} -p 5432:${params.port || 5432}  -e POSTGRES_USER=${params.username} -e POSTGRES_PASSWORD=${params.password} -e POSTGRES_DB=${params.database} -d postgres`).catch(e => null)
+        logCmd.done({
+            text: "Start postgres database with docker"
+        })
+    }
 }
 
-export const dockerController = new DockerController()
+export const dockerController = new DockerController();
