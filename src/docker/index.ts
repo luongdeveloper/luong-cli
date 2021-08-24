@@ -4,7 +4,6 @@ import inquirer from 'inquirer';
 import { dockerController } from "./DockerController";
 
 
-const cmd = new Command();
 
 enum OptionAction {
     ChooseFunction = "ChooseFunction"
@@ -23,12 +22,13 @@ export async function commandLineDocker() {
             await dockerController.setup()
             break;
         case "Postgres":
+            dockerController.installPostgres()
             break;
-        case "MySql SLL":
-            console.log("I will gen code for you ");
+        case "MySql":
+            console.log("I will install MySQL for you, but not now ");
             break;
         case "MongoDb":
-            console.log("I will gen code for you ");
+            console.log("I will install MySQL for you, but not now");
             break;
         default:
             break;

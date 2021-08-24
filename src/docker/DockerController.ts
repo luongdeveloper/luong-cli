@@ -1,7 +1,15 @@
 import { logCmd } from "../helper/log";
 import cliSpinners from "cli-spinners"
 import execSh from "exec-sh"
+import { Command } from "commander"
+import inquirer from 'inquirer';
+
 const execShPro = execSh.promise;
+
+
+enum OptionAction {
+    ChooseFunction = "ChooseFunction"
+}
 class DockerController {
     async setup() {
         logCmd.start({
@@ -39,20 +47,70 @@ class DockerController {
         return
     }
 
-    async installPostgres(params: {
-        username: string,
-        password: string,
-        database: string,
-        dockerName: string,
-        port: string
-    }): Promise<any> {
+    async installPostgres(): Promise<any> {
+        const data = await inquirer.prompt([{
+            type: "input",
+            message: "Enter username",
+            name: "username",
+        }, {
+            type: "input",
+            message: "Enter password",
+            name: "password",
+        }, {
+            type: "input",
+            message: "Enter database name",
+            name: "database",
+        }, {
+            type: "input",
+            message: "Enter docker name",
+            name: "dockerName",
+        }, {
+            type: "input",
+            message: "Enter port",
+            name: "port",
+        }])
+        const params = data
+
         await this.setup();
         logCmd.warn({
             text: "Start postgres database with docker"
         })
         await execShPro(`sudo docker run --name ${params.dockerName} -p 5432:${params.port || 5432}  -e POSTGRES_USER=${params.username} -e POSTGRES_PASSWORD=${params.password} -e POSTGRES_DB=${params.database} -d postgres`).catch(e => null)
         logCmd.done({
+            text: "Done postgres database with docker"
+        })
+    }
+    async installMySql(): Promise<any> {
+        const data = await inquirer.prompt([{
+            type: "input",
+            message: "Enter username",
+            name: "username",
+        }, {
+            type: "input",
+            message: "Enter password",
+            name: "password",
+        }, {
+            type: "input",
+            message: "Enter database name",
+            name: "database",
+        }, {
+            type: "input",
+            message: "Enter docker name",
+            name: "dockerName",
+        }, {
+            type: "input",
+            message: "Enter port",
+            name: "port",
+        }])
+        const params = data
+
+        await this.setup();
+        logCmd.warn({
             text: "Start postgres database with docker"
+        })
+        await execShPro(``).catch(e => null)
+        logCmd.done({
+            text: "Done postgres database with docker"
         })
     }
 }

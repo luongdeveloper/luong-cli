@@ -10,7 +10,7 @@ enum OptionAction {
     ChooseGroupAction = "ChooseGroupAction"
 }
 
-const cmd = new Command();
+export const cmd = new Command();
 
 async function run() {
     const optionGroup = await inquirer.prompt([{
