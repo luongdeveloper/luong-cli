@@ -43,8 +43,9 @@ class SSLController {
     async addDomainSSL(): Promise<any> {
         const catDefault = await fs.readFileSync('/etc/nginx/sites-enabled/default', { encoding: "utf8" });
         await execShPro(`sudo mkdir /etc/nginx/sites-enabled/backup`).catch(err => null)
+        console.log("on 46");
         await execShPro(`sudo cp /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/backup/backup${moment(new Date()).format("YYYY-MM-DD-hh-mm-ss")}`);
-
+        console.log("on 48");
 
 
         const params = await inquirer.prompt([{
@@ -58,7 +59,7 @@ class SSLController {
         }])
 
         await execShPro(`sudo certbot --nginx -d ${params.domain} -d ${params.domain}`)
-
+        console.log("on 62");
 
         const textAddServer = `
         \n\n#################################################
@@ -87,10 +88,9 @@ class SSLController {
         `
         const contentAdd = catDefault + textAddServer;
         const scriptExec = `echo "${contentAdd.replace(/[$]/g, '\\$&')}" | sudo tee -a /etc/nginx/sites-enabled/default`
-        console.log(scriptExec);
-
+        console.log("on 91");
         await execShPro(scriptExec).catch(err => null)
-
+        console.log("on 93");
 
 
         return Promise.resolve()
