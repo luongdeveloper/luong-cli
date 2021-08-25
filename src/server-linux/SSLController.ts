@@ -2,7 +2,7 @@ import { logCmd } from "../helper/log";
 import cliSpinners from "cli-spinners"
 import execSh from "exec-sh"
 import { ngnixController } from "./Ngnix";
-import fs from "fs/promises"
+// import fs from "fs/promises"
 const execShPro = execSh.promise;
 class SSLController {
     async setup() {
@@ -39,7 +39,7 @@ class SSLController {
     }
 
     addDomainSSL(params: { domain: string, port: number }): Promise<any> {
-        fs.readFile('/etc/nginx/sites-enabled/default')
+        // fs.readFile('/etc/nginx/sites-enabled/default')
         return Promise.resolve()
     }
 }
