@@ -2,7 +2,9 @@ import { logCmd } from "../helper/log";
 import cliSpinners from "cli-spinners"
 import execSh from "exec-sh"
 import { ngnixController } from "./Ngnix";
-// import fs from "fs/promises"
+import fs from "fs"
+import moment from "moment"
+import inquirer from "inquirer"
 const execShPro = execSh.promise;
 class SSLController {
     async setup() {
@@ -38,10 +40,62 @@ class SSLController {
         return
     }
 
-    addDomainSSL(params: { domain: string, port: number }): Promise<any> {
-        // fs.readFile('/etc/nginx/sites-enabled/default')
+    async addDomainSSL(): Promise<any> {
+        const catDefault = await fs.readFileSync('/etc/nginx/sites-enabled/default', { encoding: "utf8" });
+        await execShPro(`sudo mkdir /etc/nginx/sites-enabled/backup`).catch(err => null)
+        await execShPro(`sudo cp /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/backup/backup${moment(new Date()).format("YYYY-MM-DD-hh-mm-ss")}`);
+
+
+
+        const params = await inquirer.prompt([{
+            type: "input",
+            message: "Enter your domain",
+            name: "domain",
+        }, {
+            type: "input",
+            message: "Enter port running",
+            name: "port",
+        }])
+
+        await execShPro(`sudo certbot --nginx -d ${params.domain} -d ${params.domain}`)
+
+
+        const textAddServer = `
+        \n\n#################################################
+        server {
+            index index.html index.htm index.nginx-debian.html;
+            server_name ${params.domain}; # managed by Certbot
+            if ($scheme != "https") {
+        return 301 https://$host$request_uri;
+            }
+            location / {
+        rewrite ^ $request_uri;
+        rewrite ^/(.*) $1 break;
+        return 400;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_pass    http://127.0.0.1:${params.port}/$uri;
+            }
+        
+            listen [::]:443 ssl; # managed by Certbot
+            listen 443 ssl; # managed by Certbot
+            ssl_certificate /etc/letsencrypt/live/${params.domain}/fullchain.pem; # managed by Certbot
+            ssl_certificate_key /etc/letsencrypt/live/${params.domain}/privkey.pem; # managed by Certbot
+            include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+        }
+        `
+        const contentAdd = catDefault + textAddServer;
+        const scriptExec = `echo "${contentAdd.replace(/[$]/g, '\\$&')}" | sudo tee -a /etc/nginx/sites-enabled/default`
+        console.log(scriptExec);
+
+        await execShPro(scriptExec).catch(err => null)
+
+
+
         return Promise.resolve()
     }
 }
+
 
 export const sslController = new SSLController()

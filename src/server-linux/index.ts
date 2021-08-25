@@ -26,7 +26,7 @@ export async function commandLineServer() {
             await sslController.setup()
             break;
         case "Add SLL":
-            console.log("I will gen code for you ");
+            sslController.addDomainSSL()
             break;
         default:
             break;
