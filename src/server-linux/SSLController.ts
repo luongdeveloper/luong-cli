@@ -42,9 +42,9 @@ class SSLController {
 
     async addDomainSSL(): Promise<any> {
         const catDefault = await fs.readFileSync('/etc/nginx/sites-enabled/default', { encoding: "utf8" });
-        await execShPro(`sudo mkdir /etc/nginx/sites-enabled/backup`).catch(err => null)
+        await execShPro(`sudo mkdir /etc/backup-ngnix`).catch(err => null)
         console.log("on 46");
-        await execShPro(`sudo cp /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/backup/backup${moment(new Date()).format("YYYY-MM-DD-hh-mm-ss")}`);
+        await execShPro(`sudo cp /etc/nginx/sites-enabled/default /etc/backup-ngnix${moment(new Date()).format("YYYY-MM-DD-hh-mm-ss")}`);
         console.log("on 48");
 
 
